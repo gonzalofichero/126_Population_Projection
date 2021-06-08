@@ -51,7 +51,7 @@ PopProj <- function(N0,r,t){
 }
 
 
-N0 <- N1
+N0 <- pop$Pop[pop$Year == last.y]
 t <- seq(0,25,1)
 
 N25.fiver <- PopProj(N0=N0, r = r.fiver, t=t)
@@ -71,8 +71,34 @@ legend("bottomright",c("Current Pop", "Projection 5-y rate", "Projection 10-y ra
 
 # Ex 1.3: Make an assumption about one of the demographic components, and compare this projection with the base line
 
+# We give arbitrary values to the demographic components (high fertility), making the growth rate 20% higher than calculated for 5-year period
+N0 <- pop$Pop[pop$Year == last.y]
+b_a <- 0.0035
+d_a <- 0.0016
+m_a <- 0.001
+t <- seq(0,25,1)
+PopProj <- function(N0,b,d,m,t){
+  r <- b - d + m
+  NT <- N0*exp(r*t)
+  return(NT)
+}
+
+N25_sim <- PopProj(N0, b=b_a, d=d_a, m=m_a, t=t)
 
 
+## plotting
+plot(pop$Year[pop$Year >=2000], pop$Pop[pop$Year >=2000], t="n",xlab="Year", ylab="population size", 
+     ylim=range(min(pop$Pop[pop$Year >=2000]), max(N25.fiver,N25.tenr)),
+     xlim=range(2000,2019+25))
+grid()
+lines(pop$Year[pop$Year >=2000], pop$Pop[pop$Year >=2000],col=1,lwd=2)
+lines(seq(2019,2019+25,1),N25.fiver,col=2, lwd=2)
+lines(seq(2019,2019+25,1),N25.tenr,col=3,lwd=2,lty=2)
+lines(seq(2019,2019+25,1),N25_sim,col=4,lwd=2,lty=2)
+legend("bottomright",c("Current Pop", "Projection 5-y rate", "Projection 10-y rate", "High Fertility Finland"),
+       col=1:4,lwd=2,lty=c(1,2,3,4))
+
+# A higher fertility, making the growth rate 20% higher is not enough to account for the loss of growth in the last 5 year period.
 
 
 
