@@ -46,7 +46,7 @@ r.tenr <- (1/10)*log(N1/N0.tenr)
 
 # Function to return Population at moment t, given rate r
 PopProj <- function(N0,r,t){
-  NT <- N0*(1+r)^t
+  NT <- N0*exp(r*t)
   return(NT)
 }
 
