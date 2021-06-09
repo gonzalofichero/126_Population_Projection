@@ -125,3 +125,32 @@ legend("bottomright", c("Current Pop", "Projection 5-y rate", "Projection 10-y r
 
 
 
+
+
+#######################
+# Exercise 2
+
+
+# Ex 2.1
+
+# Downloading Finland's exposures
+
+expos <- readHMDweb(CNTRY= "FIN",item="Exposures_1x1",
+                       username= user.n,
+                       password= user.pass,
+                       fixup=TRUE)
+
+glimpse(expos)
+
+
+
+# Downloading Age-specific fertility rates for Finland
+
+fertil <- readHFDweb(CNTRY= "FIN",item="asfrRR",
+                     username= user.n,
+                     password= user.pass,
+                     fixup=TRUE)
+glimpse(fertil)
+
+
+
