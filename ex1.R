@@ -142,18 +142,18 @@ ex2.date <- max(finland$Year) - 5
 finland.pop <- readHMDweb( CNTRY = "FIN", item="Population5",
                        username = user.n, password = user.pass)
 
-finland.pop <- finland.pop %>% 
-                mutate(Nfx = (Female1+Female2)/2,
-                       Nmx = (Male1+Male2)/2) %>% 
-                filter(Year == ex2.date) %>% 
-                select(Year, Age,Nfx,Nmx)
+finland.pop.2014 <- finland.pop %>% 
+                    mutate(Nfx = (Female1+Female2)/2,
+                           Nmx = (Male1+Male2)/2) %>% 
+                    filter(Year == ex2.date) %>% 
+                    select(Year, Age,Nfx,Nmx)
 
 
 # We need to group the 0 and 1 age group to create 0-4 age group
-finland.pop$Age_groups <- finland.pop$Age
-finland.pop$Age_groups[finland.pop$Age==0 | finland.pop$Age==1] <- 0
+finland.pop.2014$Age_groups <- finland.pop.2014$Age
+finland.pop.2014$Age_groups[finland.pop.2014$Age==0 | finland.pop.2014$Age==1] <- 0
 
-finland.pop.v2 <- finland.pop  %>% 
+finland.pop.2014.v2 <- finland.pop.2014  %>% 
                     group_by(Age_groups) %>% 
                       summarise(Nfx.sum = sum(Nfx, na.rm = T),
                                 Nmx.sum = sum(Nmx, na.rm = T))
@@ -229,8 +229,8 @@ Fx <- c(0,0, ASFR$ASFR.sum, 0,0,0,0,0,0,0,0,0,0,0,0)
 # Now getting everything together:
 
 finland.2014 <- data.table( Age = Male_LT$Age_groups,
-                            NFx = finland.pop.v2$Nfx.sum,
-                            NMx = finland.pop.v2$Nmx.sum,
+                            NFx = finland.pop.2014.v2$Nfx.sum,
+                            NMx = finland.pop.2014.v2$Nmx.sum,
                             LMx = Male_LT$Lx,
                             LFx = Female_LT$Lx,
                             Fx = Fx)
@@ -311,6 +311,12 @@ finland.2014.long <- finland.2014 %>%
 
 
 # Plot Projection vs Real 2019 Population (both sexes)
+finland.pop.2019 <- finland.pop %>% 
+                    mutate(Nfx = (Female1+Female2)/2,
+                           Nmx = (Male1+Male2)/2) %>% 
+                    filter(Year == 2019) %>% 
+                    select(Year, Age,Nfx,Nmx)
+
 
 
 
