@@ -305,20 +305,51 @@ finland.2014.long <- finland.2014 %>%
                       pivot_longer(-Age,names_to = "Year",values_to = "Population")
 
 
-# Plot Projection vs Baseline (both sexes):
 
-
-
-
-# Plot Projection vs Real 2019 Population (both sexes)
+###########################################################
+# Plot Projection vs Real 2019 Population (by sex)
 finland.pop.2019 <- finland.pop %>% 
                     mutate(Nfx = (Female1+Female2)/2,
                            Nmx = (Male1+Male2)/2) %>% 
                     filter(Year == 2019) %>% 
-                    select(Year, Age,Nfx,Nmx)
+                    select(Year, Age, Nfx, Nmx)
+
+# We need to group the 0 and 1 age group to create 0-4 age group
+finland.pop.2019$Age_groups <- finland.pop.2019$Age
+finland.pop.2019$Age_groups[finland.pop.2019$Age==0 | finland.pop.2019$Age==1] <- 0
+
+finland.pop.2019 <- finland.pop.2019  %>% 
+                        group_by(Age_groups) %>% 
+                        summarise(Nfx = sum(Nfx, na.rm = T),
+                                  Nmx = sum(Nmx, na.rm = T)) %>% 
+                        rename(Age = Age_groups) %>% 
+                        mutate(Origin = "Real 2019 population")
 
 
+finland.compare <- finland.2014 %>% 
+                    select(Age, NFxt_5, NMxt_5) %>% 
+                    rename(Nfx = NFxt_5,
+                           Nmx = NMxt_5) %>% 
+                    mutate(Origin = "Projected 2019 population") %>% 
+                    rbind(finland.pop.2019)
 
+# Females
+finland.compare %>% 
+  ggplot(aes(x = Age, y= Nfx, fill=Origin)) +
+    geom_area(position = "identity", alpha=0.3) +
+    coord_flip() +
+    theme_bw() +
+    ggtitle("Finland female population: Real vs Projection") +
+    scale_fill_manual(values=c("#E69F00", "#56B4E9"))
+
+# Males
+finland.compare %>% 
+  ggplot(aes(x = Age, y= Nmx, fill=Origin)) +
+  geom_area(position = "identity", alpha=0.3) +
+  coord_flip() +
+  theme_bw() +
+  ggtitle("Finland male population: Real vs Projection") +
+  scale_fill_manual(values=c("#E69F00", "#56B4E9"))
 
 
 
