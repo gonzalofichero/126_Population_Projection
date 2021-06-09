@@ -235,6 +235,84 @@ finland.2014 <- data.table( Age = Male_LT$Age_groups,
                             LFx = Female_LT$Lx,
                             Fx = Fx)
 
+# Creating the Tx's for each sex
+finland.2014$TMx <- rev(cumsum(rev(finland.2014$LMx)))
+finland.2014$TFx <- rev(cumsum(rev(finland.2014$LFx)))
+
+#####################
+# Females...
+# Time to calculate sFx
+finland.2014$sFx_5 <- NA
+finland.2014$NFxt_5 <- NA
+for(i in 1:22){
+  finland.2014$sFx_5[i] <- finland.2014$LFx[i+1]/finland.2014$LFx[i]
+}
+for(i in 2:23){
+  finland.2014$NFxt_5[i] <- finland.2014$NFx[i-1] * finland.2014$sFx_5[i-1]
+}
+
+
+# The population in the last age group is not correct
+# Adjusting the last age group
+finland.2014$sFx_5[finland.2014$Age==105] <- finland.2014$TFx[finland.2014$Age==110]/finland.2014$TFx[finland.2014$Age==105]
+finland.2014$NFxt_5[finland.2014$Age==110] <- (finland.2014$NFx[finland.2014$Age==110] + finland.2014$NFx[finland.2014$Age==105]) * finland.2014$sFx_5[finland.2014$Age==105]
+
+finland.2014$bFx <- NA
+# Gonna use standard birth ratio... don't wanna look for the real one
+factor.srb <- 1/(1 + 1.05)
+Fradix <- finland.2014$LFx[finland.2014$Age==0]/(2*100000)
+
+
+# Estimate the first age group
+for(i in 1:23){
+  finland.2014$bFx[i] <- factor.srb * (Fradix * (finland.2014$Fx[i]+finland.2014$sFx[i]*finland.2014$Fx[i+1]))
+}
+finland.2014$NFxt_5[finland.2014$Age==0] <- sum(finland.2014$NFx * finland.2014$bFx, na.rm=T)
+
+
+#####################
+# Males
+# Time to calculate sMx and do all same stuff as for Females
+finland.2014$sMx_5 <- NA
+finland.2014$NMxt_5 <- NA
+for(i in 1:22){
+  finland.2014$sMx_5[i] <- finland.2014$LMx[i+1]/finland.2014$LMx[i]
+}
+for(i in 2:23){
+  finland.2014$NMxt_5[i] <- finland.2014$NMx[i-1] * finland.2014$sMx_5[i-1]
+}
+
+# The population in the last age group is not correct
+# Adjusting the last age group
+finland.2014$sMx_5[finland.2014$Age==105] <- finland.2014$TMx[finland.2014$Age==110]/ finland.2014$TMx[finland.2014$Age==105]
+finland.2014$NMxt_5[finland.2014$Age==110] <- (finland.2014$NMx[finland.2014$Age==110] + finland.2014$NMx[finland.2014$Age==105]) * finland.2014$sMx_5[finland.2014$Age==105]
+
+finland.2014$bMx <- NA
+factor.srb.M <- 1.05/(1 + 1.05)
+Fradix <- finland.2014$LMx[finland.2014$Age==0]/(2*100000)
+
+# Estimate the first age group
+for(i in 1:23){
+  finland.2014$bMx[i] <- factor.srb.M * (Fradix * (finland.2014$Fx[i]+finland.2014$sMx[i]*finland.2014$Fx[i+1]))
+}
+finland.2014$NMxt_5[finland.2014$Age==0] <- sum(finland.2014$NMx * finland.2014$bMx, na.rm=T)
+
+
+# Everything together, again:
+finland.2014.long <- finland.2014 %>%
+                      select(Age,NFx,NFxt_5) %>%
+                      rename("2014"=NFx, "2019"=NFxt_5) %>%
+                      pivot_longer(-Age,names_to = "Year",values_to = "Population")
+
+
+# Plot Projection vs Baseline (both sexes):
+
+
+
+
+# Plot Projection vs Real 2019 Population (both sexes)
+
+
 
 
 
