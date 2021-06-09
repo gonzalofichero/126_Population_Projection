@@ -1,6 +1,7 @@
 # Loading libraries
 library(tidyverse)
 library(HMDHFDplus)
+library(data.table)
 
 # Setting user and password for HMD
 
@@ -133,14 +134,63 @@ legend("bottomright", c("Current Pop", "Projection 5-y rate", "Projection 10-y r
 
 # Ex 2.1
 
-# Downloading Finland's exposures
 
-expos <- readHMDweb(CNTRY= "FIN",item="Exposures_1x1",
-                       username= user.n,
-                       password= user.pass,
-                       fixup=TRUE)
+# Let's start with:
+# We take the mid-year population for the 5-age group population of Finland
+ex2.date <- max(finland$Year) - 5
 
-glimpse(expos)
+finland.pop <- readHMDweb( CNTRY = "FIN", item="Population5",
+                       username = user.n, password = user.pass)
+
+finland.pop <- finland.pop %>% 
+                mutate(Nfx = (Female1+Female2)/2,
+                       Nmx = (Male1+Male2)/2) %>% 
+                filter(Year == ex2.date) %>% 
+                select(Year, Age,Nfx,Nmx)
+
+
+# We need to group the 0 and 1 age group to create 0-4 age group
+finland.pop$Age_groups <- finland.pop$Age
+finland.pop$Age_groups[finland.pop$Age==0 | finland.pop$Age==1] <- 0
+
+finland.pop.v2 <- finland.pop  %>% 
+                    group_by(Age_groups) %>% 
+                      summarise(Nfx.sum = sum(Nfx, na.rm = T),
+                                Nmx.sum = sum(Nmx, na.rm = T))
+
+
+# Male Life table to get Lx
+Male_LT <- readHMDweb( CNTRY = "FIN", item="mltper_5x1",
+                       username = user.n, password = user.pass)
+
+Male_LT <- Male_LT %>% 
+            select(Year, Age, Lx) %>% 
+            filter(Year == ex2.date)
+
+
+# We need to group the 0 and 1 age group to create 0-4 age group
+Male_LT$Age_groups <- Male_LT$Age
+Male_LT$Age_groups[Male_LT$Age==0 | Male_LT$Age==1] <- 0
+
+Male_LT <- Male_LT  %>% group_by(Age_groups) %>% 
+                        summarise(Lx = sum(Lx, na.rm = T))
+
+
+# Female Life table to get Lx
+Female_LT <- readHMDweb( CNTRY = "FIN", item="fltper_5x1",
+                       username = user.n, password = user.pass)
+
+Female_LT <- Female_LT %>% 
+  select(Year, Age, Lx) %>% 
+  filter(Year == ex2.date)
+
+
+# We need to group the 0 and 1 age group to create 0-4 age group
+Female_LT$Age_groups <- Female_LT$Age
+Female_LT$Age_groups[Female_LT$Age==0 | Female_LT$Age==1] <- 0
+
+Female_LT <- Female_LT  %>% group_by(Age_groups) %>% 
+  summarise(Lx = sum(Lx, na.rm = T))
 
 
 
@@ -151,6 +201,40 @@ fertil <- readHFDweb(CNTRY= "FIN",item="asfrRR",
                      password= user.pass,
                      fixup=TRUE)
 glimpse(fertil)
+
+Births <- fertil %>%  filter(Year == ex2.date)
+
+# Age groups
+Births$Age2 <- 12:55
+Births$Age_groups[Births$Age2>=12 & Births$Age2<=14] <- 1
+Births$Age_groups[Births$Age2>=15 & Births$Age2<=19] <- 2
+Births$Age_groups[Births$Age2>=20 & Births$Age2<=24] <- 3
+Births$Age_groups[Births$Age2>=25 & Births$Age2<=29] <- 4
+Births$Age_groups[Births$Age2>=30 & Births$Age2<=34] <- 5
+Births$Age_groups[Births$Age2>=35 & Births$Age2<=39] <- 6
+Births$Age_groups[Births$Age2>=40 & Births$Age2<=44] <- 7
+Births$Age_groups[Births$Age2>=45 & Births$Age2<=49] <- 8
+Births$Age_groups[Births$Age2>=50 & Births$Age2<=55] <- 9
+
+
+ASFR <- Births  %>% group_by(Age_groups) %>% 
+                    summarise(ASFR.sum = sum(ASFR, na.rm = T))
+
+ASFR$ASFR.sum <- ASFR$ASFR.sum/5
+
+Fx <- c(0,0, ASFR$ASFR.sum, 0,0,0,0,0,0,0,0,0,0,0,0)
+
+
+
+# Now getting everything together:
+
+finland.2014 <- data.table( Age = Male_LT$Age_groups,
+                            NFx = finland.pop.v2$Nfx.sum,
+                            NMx = finland.pop.v2$Nmx.sum,
+                            LMx = Male_LT$Lx,
+                            LFx = Female_LT$Lx,
+                            Fx = Fx)
+
 
 
 
