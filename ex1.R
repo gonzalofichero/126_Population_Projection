@@ -342,10 +342,11 @@ finland.compare %>%
     ggtitle("Finland female population: Real vs Projection") +
     scale_fill_manual(values=c("#E69F00", "#56B4E9"))
 
-# Males
+# Males + Females in 1 plot
 finland.compare %>% 
-  ggplot(aes(x = Age, y= Nmx, fill=Origin)) +
+  ggplot(aes(x = Age, y= Nfx, fill=Origin)) +
   geom_area(position = "identity", alpha=0.3) +
+  geom_area(aes(x = Age, y= -Nmx, fill=Origin), position = "identity", alpha=0.3) +
   coord_flip() +
   theme_bw() +
   ggtitle("Finland male population: Real vs Projection") +
