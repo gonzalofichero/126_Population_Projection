@@ -363,6 +363,13 @@ finland.compare %>%
   coord_flip() +
   theme_bw() +
   ggtitle("Finland population: Real vs Projection") +
-  scale_color_manual(values=c("#E69F00", "#56B4E9"))
+  scale_color_manual(values=c("#E69F00", "#56B4E9")) +
+  scale_y_continuous(breaks=c(-2e+05, -1e+05, 0, 1e+05, 2e+05),
+                   labels=c("200", "100", "0", "100", "200"),
+                   name = "Population (in thousands)") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+
 
 
