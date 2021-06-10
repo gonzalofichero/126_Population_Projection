@@ -354,3 +354,15 @@ finland.compare %>%
 
 
 
+# Males + Females in 1 plot: lineplot that looks like density
+finland.compare %>% 
+  ggplot(aes(x = Age, y= Nfx, col=Origin)) +
+  geom_line(size=1.5, alpha=0.4) +
+  geom_line(aes(x = Age, y= -Nmx, col=Origin),size=1.5, alpha=0.4) +
+  geom_hline(yintercept=0) +
+  coord_flip() +
+  theme_bw() +
+  ggtitle("Finland population: Real vs Projection") +
+  scale_color_manual(values=c("#E69F00", "#56B4E9"))
+
+
