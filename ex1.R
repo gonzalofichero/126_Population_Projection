@@ -373,3 +373,38 @@ finland.compare %>%
 
 
 
+#######################
+# Exercise 4
+
+# Take again the population that you used for Exercise #2. 
+# Project the population for 5 years ahead, but this time use matrix formulas. 
+# Compare your results with the projections that you obtained in Exercise 2. 
+# Are they the same?
+
+
+
+# ------------------------------------------
+#  Elements for matrix notation
+# ------------------------------------------
+m <- nrow(finland.2014)
+
+sFx <- finland.2014$sFx_5
+NFx <- finland.2014$NFx
+Bx <- finland.2014$bFx
+
+Bx[is.na(Bx)] <-0
+sFx <- sFx[!is.na(sFx)]
+
+L <- matrix(0, nrow = m, ncol = m)
+L[1,] <- Bx
+diag(L[-1,]) <- sFx
+L[m,m] <- sFx[m-1]
+
+Nfx5.matrix <- c(L %*% NFx)
+Nfx5.manual <- finland.2014$NFxt_5
+
+
+all.equal(Nfx5.manual, Nfx5.matrix)
+
+
+
