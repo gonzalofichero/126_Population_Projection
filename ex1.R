@@ -374,6 +374,13 @@ finland.compare %>%
 
 
 
+# Literature
+# Fertility:
+  # Hellstrand, J., Nisén, J., & Myrskylä, M. (2020). All-time low period fertility in Finland: Demographic drivers, tempo effects, and cohort implications. Population studies, 74(3), 315-329.
+  # Hiilamo, H. (2017). Fertility response to economic recessions in Finland 1991–2015. Finnish Yearbook of Population Research, 52, 15-28.
+# Migration:
+  # Croucher, S. M., Galy-Badenas, F., Condon, S. M., Sharapan, M., Salonen, M., Croucher, S. M., ... & Salonen, M. (2021). Migration to Finland and the Nordic Nations. Migration and Media in Finland: Perceptions and Depictions of Natives, Immigrants and Refugees, 25-46.
+
 
 
 #######################
