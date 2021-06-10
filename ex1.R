@@ -195,10 +195,13 @@ Female_LT <- Female_LT  %>% group_by(Age_groups) %>%
 
 
 # Downloading Age-specific fertility rates for Finland
+user.n.hfd <- readline(prompt="Enter HFD username: ")
+user.pass.hfd <- readline(prompt="Enter HFD password: ")
+
 
 fertil <- readHFDweb(CNTRY= "FIN",item="asfrRR",
-                     username= user.n,
-                     password= user.pass,
+                     username= user.n.hfd,
+                     password= user.pass.hfd,
                      fixup=TRUE)
 glimpse(fertil)
 
